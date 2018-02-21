@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WIveL.today</title>
+    <script src="http://localhost:8082/auth/js/keycloak.js"></script>
+    <script>
+        var keycloak = Keycloak();
+        keycloak.init().success(function(authenticated) {
+            console.log(authenticated ? "authenticated" : "not authenticated");
+        }).error(function() {
+            console.error("failed to initialize");
+        });
+    </script>
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+
+        var getResponse = function(xhr) {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // recievedData = JSON.parse(xhr.responseText);
+                    gebi('data').innerHTML = xhr.responseText;
+                } else {
+                    alert("There was a problem with the request to data.json.");
+                }
+            }
+        };
+
+    </script>
+</head>
+<body>
+<a onclick="keycloak.login()">login</a><br>
+<a onclick="keycloak.logout()">logout</a><br>
+<a onclick="get('/user/hello', getResponse)">get data</a><br>
+<div id="data"></div>
+</body>
+</html>
