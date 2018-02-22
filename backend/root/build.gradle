@@ -17,6 +17,9 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-security'
 
+    compile("org.springframework.boot:spring-boot-starter-data-rest")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
+
     compile 'org.keycloak:keycloak-spring-boot-starter:3.4.3.Final'
     compile 'org.keycloak:keycloak-spring-security-adapter:3.4.3.Final'
 

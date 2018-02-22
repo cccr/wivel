@@ -6,9 +6,9 @@
     <script src="http://localhost:8082/auth/js/keycloak.js"></script>
     <script>
         var keycloak = Keycloak();
-        keycloak.init().success(function(authenticated) {
+        keycloak.init().success(function (authenticated) {
             console.log(authenticated ? "authenticated" : "not authenticated");
-        }).error(function() {
+        }).error(function () {
             console.error("failed to initialize");
         });
     </script>
@@ -16,7 +16,13 @@
     <script src="js/utils.js"></script>
     <script>
 
-        var getResponse = function(xhr) {
+        const CONST = {
+            note: {
+                submitUrl: "/notes"
+            }
+        };
+
+        var getResponse = function (xhr) {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     // recievedData = JSON.parse(xhr.responseText);
@@ -26,6 +32,27 @@
                 }
             }
         };
+        var getNotes = function (xhr) {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // recievedData = JSON.parse(xhr.responseText);
+                    gebi('notes').innerHTML = xhr.responseText;
+                } else {
+                    alert("There was a problem with the request to data.json.");
+                }
+            }
+        };
+
+        ready(function () {
+            var form = gebi("noteForm");
+            form.addEventListener("submit", formSubmit, true);
+        });
+
+        var formSubmit = function (e) {
+            e.preventDefault();
+            post(CONST.note.submitUrl, {text: gebi("noteText").value}, LOGGER);
+            return false;
+        }
 
     </script>
 </head>
@@ -34,5 +61,12 @@
 <a onclick="keycloak.logout()">logout</a><br>
 <a onclick="get('/user/hello', getResponse)">get data</a><br>
 <div id="data"></div>
+<hr>
+<a onclick="get('/notes', getNotes)">get mongo data</a><br>
+<div id="notes"></div>
+<form id="noteForm">
+    <label for="noteText">note:</label><textarea id="noteText"></textarea>
+    <div><button type="submit">save</button></div>
+</form>
 </body>
 </html>

@@ -1,4 +1,4 @@
-function post(url, callback, data) {
+function post(url, data, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url, true);
     xhr.onload = function(e) {
@@ -7,6 +7,7 @@ function post(url, callback, data) {
         }
     };
 
+    xhr.setRequestHeader("Content-Type", "application/json");
     addAuthTokenHeader(xhr);
     xhr.send(JSON.stringify(data));
 

@@ -6,9 +6,15 @@ function ready(fn) {
     }
 }
 
+var LOGGER = function(message){
+    return function(){
+        console.log(message);
+    }
+};
+
 var gebi = function(id) {
     return document.getElementById(id);
-}
+};
 
 var createElement = function(tag, inner, attrs, classList, parent) {
     var element = document.createElement(tag);
@@ -26,7 +32,7 @@ var createElement = function(tag, inner, attrs, classList, parent) {
     });
     DOMTokenList.prototype.add.apply(element.classList, classList);
     return element;
-}
+};
 
 var Hide = {};
 
