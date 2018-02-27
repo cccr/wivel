@@ -6,17 +6,21 @@ function ready(fn) {
     }
 }
 
-var LOGGER = function(message){
-    return function(){
+const LOGGER = function (message) {
+    return function () {
         console.log(message);
     }
 };
 
-var gebi = function(id) {
+const gebi = function (id) {
     return document.getElementById(id);
 };
 
-var createElement = function(tag, inner, attrs, classList, parent) {
+const gevbi = function (id) {
+    return gebi(id).value;
+};
+
+const createElement = function (tag, inner, attrs, classList, parent) {
     var element = document.createElement(tag);
     if (parent) {
         parent.appendChild(element);
@@ -27,14 +31,14 @@ var createElement = function(tag, inner, attrs, classList, parent) {
         }
         element.appendChild(inner);
     }
-    Object.keys(attrs).forEach(function(attr) {
+    Object.keys(attrs).forEach(function (attr) {
         element.setAttribute(attr, attrs[attr]);
     });
     DOMTokenList.prototype.add.apply(element.classList, classList);
     return element;
 };
 
-var Hide = {};
+const Hide = {};
 
 Hide.toggle = function(el) {
     Hide.toggleClass(el, 'hide');

@@ -32,7 +32,7 @@
                 }
             }
         };
-        var getNotes = function (xhr) {
+        var fillData = function (xhr) {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     // recievedData = JSON.parse(xhr.responseText);
@@ -50,8 +50,15 @@
 
         var formSubmit = function (e) {
             e.preventDefault();
-            post(CONST.note.submitUrl, {text: gebi("noteText").value}, LOGGER);
+            post(CONST.note.submitUrl, {
+                text: gevbi("noteText"),
+                tags: gevbi("noteTags").split(" ")
+            }, LOGGER);
             return false;
+        };
+
+        var getByTag = function (e) {
+            get(`/notes/search/findByTagsName?tag=${gevbi("tag")}`, fillData)
         }
 
     </script>
@@ -62,11 +69,21 @@
 <a onclick="get('/user/hello', getResponse)">get data</a><br>
 <div id="data"></div>
 <hr>
-<a onclick="get('/notes', getNotes)">get mongo data</a><br>
-<div id="notes"></div>
+<h2>add</h2>
+<a onclick="get('/notes', fillData)">get mongo data</a><br>
 <form id="noteForm">
-    <label for="noteText">note:</label><textarea id="noteText"></textarea>
-    <div><button type="submit">save</button></div>
+    <label for="noteText">note:</label><textarea id="noteText"></textarea><br>
+    <label for="noteTags">tags:</label><input id="noteTags"/>
+    <div>
+        <button type="submit">save</button>
+    </div>
 </form>
+<hr>
+<h2>by Tags</h2>
+<label for="tag">tag</label><input id="tag"/>
+<a onclick="getByTag()">get mongo data</a><br>
+<hr>
+<h2>data</h2>
+<div id="notes"></div>
 </body>
 </html>

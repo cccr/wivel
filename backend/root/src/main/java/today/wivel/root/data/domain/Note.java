@@ -1,21 +1,19 @@
 package today.wivel.root.data.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import today.wivel.root.data.Auditable;
 
+import java.util.List;
+
+@Document
 public class Note extends Auditable<String> {
     @Id
     private String id;
 
     private String text;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    List<Tag> tags;
 
     public String getText() {
         return text;
@@ -23,5 +21,13 @@ public class Note extends Auditable<String> {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }
