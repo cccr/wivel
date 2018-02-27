@@ -5,12 +5,34 @@
     <title>WIveL.today</title>
     <script src="http://localhost:8082/auth/js/keycloak.js"></script>
     <script>
-        var keycloak = Keycloak();
-        keycloak.init().success(function (authenticated) {
+        const keycloak = Keycloak();
+        keycloak.init({
+            onLoad: "check-sso",
+            refreshToken: localStorage.getItem('refresh')
+        }).success(function (authenticated) {
             console.log(authenticated ? "authenticated" : "not authenticated");
         }).error(function () {
             console.error("failed to initialize");
         });
+
+        keycloak.onAuthSuccess = function() {
+            loadData();
+            localStorage.setItem('refresh', keycloak.refreshToken);
+        };
+
+        keycloak.onTokenExpired = function() {
+            keycloak.updateToken(0).success(function() {
+                loadData();
+                console.log("refreshed");
+                localStorage.setItem('refresh', keycloak.refreshToken);
+            }).error(function() {
+                console.error('Failed to refresh token');
+            });
+
+        };
+
+
+
     </script>
     <script src="js/data.js"></script>
     <script src="js/utils.js"></script>
@@ -22,7 +44,7 @@
             }
         };
 
-        var getResponse = function (xhr) {
+        const getResponse = function (xhr) {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     // recievedData = JSON.parse(xhr.responseText);
@@ -32,7 +54,7 @@
                 }
             }
         };
-        var fillData = function (xhr) {
+        const fillData = function (xhr) {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     // recievedData = JSON.parse(xhr.responseText);
@@ -43,12 +65,7 @@
             }
         };
 
-        ready(function () {
-            var form = gebi("noteForm");
-            form.addEventListener("submit", formSubmit, true);
-        });
-
-        var formSubmit = function (e) {
+        const formSubmit = function (e) {
             e.preventDefault();
             post(CONST.note.submitUrl, {
                 text: gevbi("noteText"),
@@ -57,9 +74,19 @@
             return false;
         };
 
-        var getByTag = function (e) {
+        ready(function () {
+            let form = gebi("noteForm");
+            form.addEventListener("submit", formSubmit, true);
+        });
+
+
+        const getByTag = function (e) {
             get(`/notes/search/findByTagsName?tag=${gevbi("tag")}`, fillData)
-        }
+        };
+
+        const loadData = function () {
+            keycloak.loadUserProfile().success((profile) => gebi('username').innerText = profile.username);
+        };
 
     </script>
 </head>
@@ -67,6 +94,7 @@
 <a onclick="keycloak.login()">login</a><br>
 <a onclick="keycloak.logout()">logout</a><br>
 <a onclick="get('/user/hello', getResponse)">get data</a><br>
+<div id="username"></div>
 <div id="data"></div>
 <hr>
 <h2>add</h2>

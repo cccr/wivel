@@ -10,7 +10,7 @@ import java.util.Date;
 public abstract class Auditable<U> {
 
     @CreatedBy
-    private U author;
+    private U createdBy;
 
     @CreatedDate
     private Date creationDate;
@@ -21,12 +21,12 @@ public abstract class Auditable<U> {
     @LastModifiedDate
     private Date lastModifiedDate;
 
-    public U getAuthor() {
-        return author;
+    public U getCreatedBy() {
+        return createdBy;
     }
 
-    public void setAuthor(U author) {
-        this.author = author;
+    public void setCreatedBy(U createdBy) {
+        this.createdBy = createdBy;
     }
 
     public Date getCreationDate() {

@@ -7,12 +7,13 @@ import today.wivel.root.data.Auditable;
 import java.util.List;
 
 @Document
-public class Note extends Auditable<String> {
+public class Note extends Auditable<User> {
     @Id
     private String id;
 
     private String text;
 
+    //todo http://www.baeldung.com/cascading-with-dbref-and-lifecycle-events-in-spring-data-mongodb
     List<Tag> tags;
 
     public String getText() {

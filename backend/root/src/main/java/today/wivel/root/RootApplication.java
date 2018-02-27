@@ -7,8 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import today.wivel.root.data.domain.User;
 
 @SpringBootApplication
 @EnableMongoAuditing
@@ -18,13 +20,13 @@ public class RootApplication {
     }
 
     @Bean
-    public AuditorAware<String> auditor() {
+    public AuditorAware<User> auditor() {
         return () -> {
             final SecurityContext securityContext = SecurityContextHolder.getContext();
-            final KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) securityContext.getAuthentication().getPrincipal();
+            final Authentication authentication = securityContext.getAuthentication();
+            final KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) authentication.getPrincipal();
             final AccessToken accessToken = keycloakPrincipal.getKeycloakSecurityContext().getToken();
-            return (String) accessToken.getOtherClaims().get("user_id");
-//            return SecurityContextHolder.getContext().getAuthentication().getName();
+            return new User((String) accessToken.getOtherClaims().get("user_id"), authentication.getName());
         };
     }
 }

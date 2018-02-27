@@ -53,6 +53,7 @@ public class KeycloakSecurityConfigurer extends KeycloakWebSecurityConfigurerAda
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/user/*").hasRole("AUTHOR")
+                .antMatchers(HttpMethod.GET, "/notes/*").anonymous()
                 .antMatchers(HttpMethod.POST, "/notes").hasRole("AUTHOR")
                 .anyRequest().permitAll();
     }
