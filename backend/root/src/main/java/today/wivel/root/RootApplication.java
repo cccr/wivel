@@ -1,16 +1,21 @@
 package today.wivel.root;
 
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.representations.AccessToken;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.repository.query.spi.EvaluationContextExtension;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import today.wivel.root.data.domain.User;
+import today.wivel.root.security.KeycloakAuthenticatorDecorator;
+import today.wivel.root.security.SecurityEvaluationContextExtension;
 
 @SpringBootApplication
 @EnableMongoAuditing
@@ -22,12 +27,22 @@ public class RootApplication {
     @Bean
     public AuditorAware<User> auditor() {
         return () -> {
-            final SecurityContext securityContext = SecurityContextHolder.getContext();
-            final Authentication authentication = securityContext.getAuthentication();
-            final KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) authentication.getPrincipal();
-            final AccessToken accessToken = keycloakPrincipal.getKeycloakSecurityContext().getToken();
-            return new User((String) accessToken.getOtherClaims().get("user_id"), authentication.getName());
+            final KeycloakAuthenticatorDecorator keycloakAuthenticatorDecorator = new KeycloakAuthenticatorDecorator();
+            final Authentication authentication = keycloakAuthenticatorDecorator.getAuthentication();
+            return new User(keycloakAuthenticatorDecorator.getPrincipal().getId(), authentication.getName());
         };
+    }
+
+    @Bean
+    EvaluationContextExtension securityExtension() {
+        return new SecurityEvaluationContextExtension();
+    }
+
+    @Bean
+    public MongoTemplate mongoTemplate(MongoDbFactory mongoDbFactory, MongoMappingContext context) {
+        MappingMongoConverter converter = new MappingMongoConverter(new DefaultDbRefResolver(mongoDbFactory), context);
+        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        return new MongoTemplate(mongoDbFactory, converter);
     }
 }
 

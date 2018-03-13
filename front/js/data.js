@@ -19,6 +19,7 @@ function get(url, callback) {
         callback(xhr)
     });
     xhr.open('GET', url);
+    xhr.setRequestHeader("Accept", "application/json");
     addAuthTokenHeader(xhr);
     xhr.send();
 }

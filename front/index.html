@@ -15,27 +15,27 @@
             console.error("failed to initialize");
         });
 
-        keycloak.onAuthSuccess = function() {
+        keycloak.onAuthSuccess = function () {
             loadData();
             localStorage.setItem('refresh', keycloak.refreshToken);
         };
 
-        keycloak.onTokenExpired = function() {
-            keycloak.updateToken(0).success(function() {
+        keycloak.onTokenExpired = function () {
+            keycloak.updateToken(0).success(function () {
                 loadData();
                 console.log("refreshed");
                 localStorage.setItem('refresh', keycloak.refreshToken);
-            }).error(function() {
+            }).error(function () {
                 console.error('Failed to refresh token');
             });
 
         };
 
 
-
     </script>
     <script src="js/data.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/templates.js"></script>
     <script>
 
         const CONST = {
@@ -57,8 +57,8 @@
         const fillData = function (xhr) {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    // recievedData = JSON.parse(xhr.responseText);
-                    gebi('notes').innerHTML = xhr.responseText;
+                    let receivedData = JSON.parse(xhr.responseText);
+                    renderNotes(receivedData);
                 } else {
                     alert("There was a problem with the request to data.json.");
                 }
@@ -81,12 +81,37 @@
 
 
         const getByTag = function (e) {
-            get(`/notes/search/findByTagsName?tag=${gevbi("tag")}`, fillData)
+            get(`/notes/search/findByTagsName?tag=${gevbi("tag")}&projection=text`, fillData)
+        };
+
+        const getByText = function (e) {
+            get(`/notes/search/findByQueryWithExpression?text=${gevbi("text")}`, fillData)
+        };
+
+        const getByAuthor = function (e) {
+            get("/notes/search/findAllForAuthor", fillData)
         };
 
         const loadData = function () {
             keycloak.loadUserProfile().success((profile) => gebi('username').innerText = profile.username);
         };
+
+        const renderNotes = function (data) {
+            let {_embedded: {notes: notes}} = data;
+
+            let template = document.createElement("template");
+            template.innerHTML = notesTmpl(notes);
+
+            let formattedNotes = gebi("formattedNotes");
+            renderFragment(formattedNotes, template)
+        };
+
+        const renderFragment = function(parent, template) {
+            while (parent.firstChild) {
+                parent.removeChild(parent.firstChild);
+            }
+            parent.appendChild(template.content)
+        }
 
     </script>
 </head>
@@ -109,9 +134,17 @@
 <hr>
 <h2>by Tags</h2>
 <label for="tag">tag</label><input id="tag"/>
-<a onclick="getByTag()">get mongo data</a><br>
+<a onclick="getByTag()">get</a><br>
+<hr>
+<h2>by text</h2>
+<label for="text">text</label><input id="text"/>
+<a onclick="getByText()">get</a><br>
+<hr>
+<h2>by author</h2>
+<a onclick="getByAuthor()">get</a><br>
 <hr>
 <h2>data</h2>
 <div id="notes"></div>
+<div id="formattedNotes"></div>
 </body>
 </html>

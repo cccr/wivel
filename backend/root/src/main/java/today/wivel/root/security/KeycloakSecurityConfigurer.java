@@ -1,4 +1,4 @@
-package today.wivel.root;
+package today.wivel.root.security;
 
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
